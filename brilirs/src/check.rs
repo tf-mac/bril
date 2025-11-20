@@ -65,7 +65,7 @@ fn get_type<'a>(
 
   env
     .get(&args[index] as &str)
-    .ok_or_else(|| InterpError::VarUndefined(args[index].to_string()))
+    .ok_or_else(|| InterpError::VarUndefined(args[index].clone()))
 }
 
 fn get_ptr_type(typ: &bril_rs::Type) -> Result<&bril_rs::Type, InterpError> {
@@ -315,7 +315,7 @@ fn type_check_instruction<'a>(
         .try_for_each(|(arg_name, expected_arg)| {
           let ty = env
             .get(arg_name as &str)
-            .ok_or_else(|| InterpError::VarUndefined(arg_name.to_string()))?;
+            .ok_or_else(|| InterpError::VarUndefined(arg_name.clone()))?;
 
           check_asmt_type(ty, &expected_arg.arg_type)
         })?;
@@ -328,22 +328,7 @@ fn type_check_instruction<'a>(
       update_env(env, dest, op_type)
     }
     Instruction::Value {
-      op: ValueOps::Get,
-      dest,
-      op_type,
-      args,
-      funcs,
-      labels,
-      pos: _,
-    } => {
-      check_num_args(0, args)?;
-      check_num_funcs(0, funcs)?;
-      check_num_labels(0, labels)?;
-
-      update_env(env, dest, op_type)
-    }
-    Instruction::Value {
-      op: ValueOps::Undef,
+      op: ValueOps::Get | ValueOps::Undef,
       dest,
       op_type,
       args,
@@ -506,7 +491,7 @@ fn type_check_instruction<'a>(
         .try_for_each(|(arg_name, expected_arg)| {
           let ty = env
             .get(arg_name as &str)
-            .ok_or_else(|| InterpError::VarUndefined(arg_name.to_string()))?;
+            .ok_or_else(|| InterpError::VarUndefined(arg_name.clone()))?;
 
           check_asmt_type(ty, &expected_arg.arg_type)
         })?;
@@ -575,6 +560,8 @@ fn type_check_func(func: &Function, prog: &Program) -> Result<(), PositionalInte
       .map_err(|e| e.add_pos(func.pos.clone()));
   }
 
+  let mut has_return_type_should_have_return = func.return_type.is_none();
+
   let mut env: FxHashMap<&str, Type> =
     FxHashMap::with_capacity_and_hasher(20, fxhash::FxBuildHasher::default());
   func.args.iter().for_each(|a| {
@@ -613,11 +600,24 @@ fn type_check_func(func: &Function, prog: &Program) -> Result<(), PositionalInte
   func.instrs.iter().try_for_each(|i| match i {
     bril_rs::Code::Label { .. } => Ok(()),
     bril_rs::Code::Instruction(instr) => {
+      if matches!(
+        instr,
+        Instruction::Effect {
+          op: EffectOps::Return,
+          ..
+        }
+      ) {
+        has_return_type_should_have_return = true;
+      }
       type_check_instruction(instr, func, prog, &mut env).map_err(|e| e.add_pos(instr.get_pos()))
     }
   })?;
 
-  Ok(())
+  if has_return_type_should_have_return {
+    Ok(())
+  } else {
+    Err(InterpError::NonVoidFuncNoRet(func.return_type.clone().unwrap()).add_pos(func.pos.clone()))
+  }
 }
 
 /// Provides validation of Bril programs. This involves
@@ -625,9 +625,9 @@ fn type_check_func(func: &Function, prog: &Program) -> Result<(), PositionalInte
 /// instructions.
 /// # Errors
 /// Will return an error if typechecking fails or if the input program is not well-formed.
-pub fn type_check(bbprog: &Program) -> Result<(), PositionalInterpError> {
-  bbprog
+pub fn type_check(prog: &Program) -> Result<(), PositionalInterpError> {
+  prog
     .functions
     .iter()
-    .try_for_each(|bbfunc| type_check_func(bbfunc, bbprog))
+    .try_for_each(|bbfunc| type_check_func(bbfunc, prog))
 }

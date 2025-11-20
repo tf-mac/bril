@@ -7,6 +7,7 @@ The `bench` directory in the Bril repository contains a fledgling suite of micro
 The current benchmarks are:
 
 * `ackermann`: Print the value of `Ack(m, n)`, the [two-argument Ackermann–Péter function][ackermann].
+* `arithmetic-series`: Print the summation operator from 1 to n, via the closed form solution.
 * `adj2csr`: Convert a graph in [adjacency matrix][adj] format (dense representation) to [Compressed Sparse Row (CSR)][csr] format (sparse representation). The random graph is generated using the same [linear congruential generator][rng].
 * `adler32`: Computes the [Adler-32 Checksum][adler32] of an integer array.
 * `armstrong`: Determines if the input is an [Armstrong number][armstrong], a number that is the sum of its own digits each raised to the power of the number of digits.
@@ -27,7 +28,7 @@ The current benchmarks are:
 * `conjugate-gradient`: Uses conjugate gradients to solve `Ax=b` for any arbitrary positive semidefinite `A`.
 * `connected-components`: Compute and print each [connected component][component] in the [adjacency matrix][adj] of an undirected graph.
 * `1dconv`: Creates a kernel and array, performs a one-dimensional convolution operation, and prints out the values in the resulting array.
-* `2dconvol`: Creates a 2d image and kernel and performs a 2d convolution on the image, and prints out the values of the image, kernel, and resulting output. 
+* `2dconvol`: Creates a 2d image and kernel and performs a 2d convolution on the image, and prints out the values of the image, kernel, and resulting output.
 * `cordic`: Print an approximation of sine(radians) using 8 iterations of the [CORDIC algorithm](https://en.wikipedia.org/wiki/CORDIC).
 * `csrmv`: Multiply a sparse matrix in the [Compressed Sparse Row (CSR)][csr] format with a dense vector. The matrix and input vector are generated using a [Linear Feedback Shift Register](https://en.wikipedia.org/wiki/Linear-feedback_shift_register) random number generator.
 * `dayofweek`: Returns the day of the week for a given date `(year, month, day)` as an integer: `1 = Monday`, ..., `7 = Sunday`.
@@ -50,12 +51,13 @@ The current benchmarks are:
 * `gcd`: Calculate Greatest Common Divisor (GCD) of two input positive integer using [Euclidean algorithm][euclidean_into].
 * `geometric-sum`: Calculate [Geometric Sum](https://en.wikipedia.org/wiki/Geometric_series) given first term, common ratio and number of terms.
 * `gol`: Print the next iteration for a matrix in [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
-* `grad_desc` Use [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent) to minimize f(w) = (w-t)^2.
 * `gpf`: Prints the greatest prime factor on an input integer
+* `grad_desc` Use [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent) to minimize f(w) = (w-t)^2.
+* `graycode`: Compute the first *n* [Gray codes](https://en.wikipedia.org/wiki/Gray_code) using the formula `G(i) = i ^ (i >> 1)`.
 * `hanoi`: Print the solution to the *n*-disk [Tower of Hanoi][hanoi] puzzle.
 * `hamming`: Computes the hamming distance between two integers.
 * `harmonic-sum`: Computes the harmonic sum up to the index *n*.
-* `insertion-sort`: Insertion sort algorithm in ascending order. 
+* `insertion-sort`: Insertion sort algorithm in ascending order.
 * `is-decreasing`: Print if a number contains strictly decreasing digits.
 * `karatsuba`: Computes the product of 2 integers using [Karatsuba's Algorithm](https://en.wikipedia.org/wiki/Karatsuba_algorithm).
 * `lcm`: Compute LCM for two numbers using a very inefficient loop.
@@ -96,12 +98,14 @@ The current benchmarks are:
 * `ray-bbox-intersection`: Finds whether a ray intersects an axis-aligned bounding box.
 * `recfact`: Compute *n!* using recursive function calls.
 * `rectangles-area-difference`: Output the difference between the areas of rectangles (as a positive value) given their respective side lengths.
+* `rgb2gray`: Convert an [RGB pixel](https://en.wikipedia.org/wiki/RGB_color_model) to a [grayscale color](https://en.wikipedia.org/wiki/Grayscale).
 * `fitsinside`: Output whether or not a rectangle fits inside of another rectangle given the width and height lengths.
 * `relative-primes`: Print all numbers relatively prime to *n* using [Euclidean algorithm][euclidean_into].
 * `riemann`: Prints the left, midpoint, and right [Riemann][riemann] Sums for a specified function, which is the square function in this benchmark.
 * `rot13`: Prints the [rot13][rot13] substitution of a character (represented as an integer in the range 0 to 25).
 * `shufflesort`: Sorts a list by shuffling it until it is sorted.
 * `sieve`: Print all prime numbers up to *n* using the [Sieve of Eratosthenes][sievee].
+* `sin`: Approximate the sine function with a polynomial.
 * `sorting-network-five`: An optimal sorting network for 5 integer inputs.
 * `sqrt`: Implements the [Newton–Raphson Method][newton] of approximating the square root of a number to arbitrary precision
 * `sqrt_bin_search`: Uses a binary search to find the floor of the square root of an integer
@@ -124,6 +128,9 @@ The current benchmarks are:
 * `combination`: Compute binomial combination, ie. n choose k, for positive integers.
 * `fib_recursive`: Computes the *n*th Fibonacci number using recursion, where `fib(n) = fib(n-1) + fib(n-2)`, with base cases `fib(0) = 0` and `fib(1) = 1`. Demonstrates recursive function calls and branching.
 * `cordic`: Compute the sine of a number using the [CORDIC][cordic] algorithm
+* `squares`: Print the squares of all integers from 1 up to input.
+* `braille`: Convert the input integer into a Braille code.
+* `kadane`: Compute the maximum sum of a contiguous subarray within a given array of numbers.
 
 Credit for several of these benchmarks goes to Alexa VanHattum and Gregory Yauney, who implemented them for their [global value numbering project][gvnblog].
 
