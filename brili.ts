@@ -440,6 +440,11 @@ function evalCall(instr: bril.Operation, state: State): Action {
   return NEXT;
 }
 
+let toTrace = false;
+let trace: bril.Instruction[] = [];
+let lastTraced = 0;
+let guardCount = 0;
+
 /**
  * Interpret an instruction in a given environment, possibly updating the
  * environment. If the instruction branches to a new label, return that label;
@@ -447,6 +452,31 @@ function evalCall(instr: bril.Operation, state: State): Action {
  * instruction or "end" to terminate the function.
  */
 function evalInstr(instr: bril.Instruction, state: State): Action {
+  if (toTrace) {
+    lastTraced = findFunc("main", state.funcs).instrs.indexOf(instr);
+    if (instr.op === 'br') {
+      const guardCheck: bril.Instruction = {
+        "dest": `guardcheck${guardCount}`,
+        "op": "const",
+        "type": "bool",
+        "value": get(state.env, instr.args![0]) as boolean
+      }
+      const guardInstr: bril.Instruction = {
+        "args": [
+          `guard${guardCount++}`
+        ],
+        "labels": [
+          "abortspeculate"
+        ],
+        "op": "guard"
+      };
+      trace.push(guardCheck, guardInstr);
+    } else if (instr.op === 'ret' || instr.op === 'print' || instr.op === 'call') {
+      toTrace = false;
+    } else if (instr.op !== 'jmp') {
+      trace.push(instr);
+    }
+  }
   state.icount += BigInt(1);
 
   // Check that we have the right number of arguments.
@@ -647,7 +677,9 @@ function evalInstr(instr: bril.Instruction, state: State): Action {
           } else return val.toFixed(17);
         } else return val.toString();
       });
-      console.log(...values);
+      if(!toTrace) {
+        console.log(...values);
+      }
       return NEXT;
     }
 
@@ -989,6 +1021,12 @@ function evalProg(prog: bril.Program) {
     args.splice(pidx, 1);
   }
 
+  let tracing_arg = args.indexOf('-t');
+  if (tracing_arg > -1) {
+    toTrace = true;
+    args.splice(tracing_arg, 1);
+  }
+
   // Remaining arguments are for the main function.k
   const expected = main.args || [];
   const newEnv = parseMainArguments(expected, args);
@@ -1007,6 +1045,13 @@ function evalProg(prog: bril.Program) {
     throw error(
       `Some memory locations have not been freed by end of execution.`,
     );
+  }
+
+  if (toTrace) {
+    console.log(JSON.stringify({
+      trace,
+      lastTraced
+    }));
   }
 
   if (profiling) {
