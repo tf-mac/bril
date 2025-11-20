@@ -677,7 +677,7 @@ function evalInstr(instr: bril.Instruction, state: State): Action {
           } else return val.toFixed(17);
         } else return val.toString();
       });
-      if(!toTrace) {
+      if(!toTrace && trace.length === 0) {
         console.log(...values);
       }
       return NEXT;
@@ -1047,7 +1047,7 @@ function evalProg(prog: bril.Program) {
     );
   }
 
-  if (toTrace) {
+  if (trace.length > 0) {
     console.log(JSON.stringify({
       trace,
       lastTraced
