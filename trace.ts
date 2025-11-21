@@ -33,4 +33,7 @@ async function main() {
         ...main.instrs
     ];
 
+    console.log(JSON.stringify(program));
 }
+
+main();

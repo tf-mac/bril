@@ -463,7 +463,7 @@ function evalInstr(instr: bril.Instruction, state: State): Action {
       }
       const guardInstr: bril.Instruction = {
         "args": [
-          `guard${guardCount++}`
+          `guardcheck${guardCount++}`
         ],
         "labels": [
           "abortspeculate"
@@ -1049,8 +1049,8 @@ function evalProg(prog: bril.Program) {
 
   if (trace.length > 0) {
     console.log(JSON.stringify({
-      trace,
-      lastTraced
+      instrs: trace,
+      lastTraced: lastTraced
     }));
   }
 
